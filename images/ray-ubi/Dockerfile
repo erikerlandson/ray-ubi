@@ -20,7 +20,7 @@ ENV LANG="C.UTF-8" \
     WORKON_HOME=/opt/ray \
     PIPENV_NOSPIN=1
 
-# after the install, deleting caches and /tmp saves over 800MB
+# after the install, deleting .cache, .local and /tmp saves space
 RUN cd /opt/ray \
  && pipenv --python 3.6 install \
  && rm -rf /tmp/* /root/.cache /root/.local \
