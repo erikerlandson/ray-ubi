@@ -4,7 +4,7 @@ A minimalist Ray distributed computing container image, based on Red Hat UBI
 This image can be found at:
 https://quay.io/repository/erikerlandson/ray-ubi
 ```sh
-$ docker pull quay.io/erikerlandson/ray-ubi`
+$ docker pull quay.io/erikerlandson/ray-ubi
 ```
 
 The `ray-ubi` image uses pipenv for install of ray and enables easy addition of python deps.
