@@ -27,6 +27,16 @@ RUN cd /opt/ray \
  && chown -R 9998:0 /opt/ray \
  && chmod -R g+rwX /opt/ray
 
+# in the above, ray has been installed as a pipenv environment - if you want to run
+# ray on this image, a way to do this is:
+# $ cd /opt/ray
+# $ . $(pipenv --venv)/bin/activate
+# $ ray start ...
+
+# to build images with additional dependencies installed:
+# FROM <this image>
+# RUN cd /opt/ray && pipenv install ...
+
 # Define an entrypoint that does proper signal handling
 ENV TINI_VERSION v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
