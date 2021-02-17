@@ -1,8 +1,18 @@
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.3
 
-WORKDIR /opt/ray
+ARG PY_MAJOR
+ARG PY_MINOR
+ARG RAY_SHA_FULL
 
-COPY Pipfile /opt/ray/
+USER root:0
+
+# Define an entrypoint that does proper signal handling
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
+RUN chmod a+rx /tini
+ENTRYPOINT ["/tini", "--"]
+
+WORKDIR /opt/ray
 
 # environment for doing the pipenv install of the Pipfile
 # WORKON_HOME tells pipenv to put the virtualenv in same dir so
@@ -12,34 +22,49 @@ ENV LANG="C.UTF-8" \
     LC_CTYPE="C.UTF-8" \
     WORKON_HOME=/opt/ray \
     PIPENV_NOSPIN=1 \
-    OC_CLIENT_RELEASE=4.6.0-0.okd-2021-01-23-132511
+    PIPENV_DEFAULT_PYTHON_VERSION=${PY_MAJOR}.${PY_MINOR} \
+    PIPENV_NO_INHERIT=True \
+    RAY_WHEEL_URL=https://ray-wheels.s3-us-west-2.amazonaws.com/master/${RAY_SHA_FULL}/ray-2.0.0.dev0-cp${PY_MAJOR}${PY_MINOR}-cp${PY_MAJOR}${PY_MINOR}m-manylinux2014_x86_64.whl
 
-# I'm using python 3.6 specifically, as it works broadly
-# and the ODH spark-cluster images also use it.
+# Install requested python version (example: python36)
+# on ubi-minimal, available python are currently 'python36' and 'python38'
+# The upstream nightly Ray wheel appears to not support python 3.8, so
+# practially speaking the only python supportable from both ubi-minimal
+# and ray is python 3.6, unless I modify this to install python from some other
+# source than micro-dnf
 # 'which' is used by pipenv to locate a python interpreter to run
-RUN microdnf install python36 which wget tar gzip \
+# 'procps-ng' provides the 'uptime' command, which is invoked remotely by the
+# ray operator/autoscaler
+RUN echo \
+ && echo "installing OS package deps" \
+ && microdnf install python${PY_MAJOR}${PY_MINOR} which procps-ng \
  && microdnf clean all \
- && pip3 install pipenv \
  && echo \
- && echo "install the ray python environment" \
+ && echo "installing pipenv" \
+ && pip3 install pipenv
+
+# creating an empty `.bashrc` below, because ray currently has a
+# hard-coded assumption that `$HOME/.bashrc` exists. I am not setting
+# HOME in these docker-files to avoid confusion during image build,
+# but you should set HOME=/opt in your container yaml during deployment
+# see: https://github.com/ray-project/ray/issues/14155
+RUN echo \
+ && echo "installing the ray python environment" \
+ && mkdir -p /opt/ray \
  && cd /opt/ray \
- && pipenv --python 3.6 install \
+ && pipenv --python ${PY_MAJOR}.${PY_MINOR} install \
+    ${RAY_WHEEL_URL} \
+    cython==0.29.0 \
+    flatbuffers \
+    psutil \
+    $(if [ "$PY_MINOR" -lt "7" ]; then \
+        echo "dataclasses" ; \
+      fi) \
  # after the install, deleting .cache, .local and /tmp saves space \
  && rm -rf /tmp/* /root/.cache /root/.local \
  && chown -R 9998:0 /opt/ray \
- && chmod -R g+rwX /opt/ray \
- && echo \
- && echo "download and install the kubectl static binary" \
- && cd /tmp \
- && wget -nv https://github.com/openshift/okd/releases/download/${OC_CLIENT_RELEASE}/openshift-client-linux-${OC_CLIENT_RELEASE}.tar.gz \
- && tar xzf openshift-client-linux-${OC_CLIENT_RELEASE}.tar.gz \
- && mv kubectl /usr/bin \
- && chmod a+rx /usr/bin/kubectl \
- && rm -rf /tmp/* \
- && echo \
- && echo "clean up dnf packages" \
- && microdnf remove wget tar gzip \
- && microdnf clean all
+ && touch /opt/.bashrc \
+ && chmod -R g+rwX /opt
 
 # in the above, ray has been installed as a pipenv environment - if you want to run
 # ray on this image, a way to do this is:
@@ -51,13 +76,7 @@ RUN microdnf install python36 which wget tar gzip \
 # FROM <this image>
 # RUN cd /opt/ray && pipenv install ...
 
-# Define an entrypoint that does proper signal handling
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
-RUN chmod a+rx /tini
-ENTRYPOINT ["/tini", "--"]
-
 CMD [ "echo", "No default command" ]
 
-# Emulate an anonymous uid, similar to executing in an OpenShift environment
+# Emulate an anonymous uid
 USER 9999:0
