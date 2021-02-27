@@ -43,4 +43,7 @@ podman build --no-cache -t ${REGISTRY}/ray-operator-ubi:${RAY_UBI_TAG} \
        --build-arg RAY_VERSION=${RAY_VERSION} \
        ./images/ray-operator-ubi
 
-# a build for hypothetical ray-ml-ubi goes here.
+podman build --no-cache -t ${REGISTRY}/ray-ml-ubi:${RAY_UBI_TAG} \
+       --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
+       --build-arg RAY_VERSION=${RAY_VERSION} \
+       ./images/ray-ml-ubi
