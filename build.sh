@@ -33,6 +33,7 @@ export RAY_VERSION=${RAY_SHA_FULL:0:8}
 export RAY_UBI_TAG="py-${PY_MAJOR}.${PY_MINOR}-ray-${RAY_VERSION}"
 
 # base image currently has to install ray from nightly wheel which uses SHA
+cat images/ray-ubi/requirements.txt.template | sed s/RAY_SHA_FULL/${RAY_SHA_FULL}/ > images/ray-ubi/requirements.txt
 podman build --no-cache -t ${REGISTRY}/ray-ubi:${RAY_UBI_TAG} \
        --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
        --build-arg RAY_SHA_FULL=${RAY_SHA_FULL} \

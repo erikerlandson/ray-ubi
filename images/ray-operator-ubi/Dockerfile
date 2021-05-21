@@ -27,12 +27,11 @@ RUN echo \
  && microdnf clean all
 
 # ray operator requires deps for autoscaler functionality
+COPY ./requirements.txt /tmp/
 RUN echo \
  && echo "installing ray operator python deps" \
  && cd /opt/ray \
- && pipenv install \
-    kubernetes \
-    boto3==1.4.8 \
+ && pipenv install -r /tmp/requirements.txt \
  && rm -rf /tmp/* /root/.cache /root/.local \
  && chown -R 9998:0 /opt/ray \
  && chmod -R g+rwX /opt/ray
