@@ -1,8 +1,7 @@
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.3
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
 
 ARG PY_MAJOR
 ARG PY_MINOR
-ARG RAY_SHA_FULL
 
 USER root:0
 
@@ -23,8 +22,7 @@ ENV LANG="C.UTF-8" \
     WORKON_HOME=/opt/ray \
     PIPENV_NOSPIN=1 \
     PIPENV_DEFAULT_PYTHON_VERSION=${PY_MAJOR}.${PY_MINOR} \
-    PIPENV_NO_INHERIT=True \
-    RAY_WHEEL_URL=https://ray-wheels.s3-us-west-2.amazonaws.com/master/${RAY_SHA_FULL}/ray-2.0.0.dev0-cp${PY_MAJOR}${PY_MINOR}-cp${PY_MAJOR}${PY_MINOR}m-manylinux2014_x86_64.whl
+    PIPENV_NO_INHERIT=True
 
 # Install requested python version (example: python36)
 # on ubi-minimal, available python are currently 'python36' and 'python38'
@@ -48,18 +46,15 @@ RUN echo \
 # HOME in these docker-files to avoid confusion during image build,
 # but you should set HOME=/opt in your container yaml during deployment
 # see: https://github.com/ray-project/ray/issues/14155
+
+# the requirements.txt is generated from a template before building this dockerfile
+COPY ./requirements.txt /tmp/
+
 RUN echo \
  && echo "installing the ray python environment" \
  && mkdir -p /opt/ray \
  && cd /opt/ray \
- && pipenv --python ${PY_MAJOR}.${PY_MINOR} install \
-    ${RAY_WHEEL_URL} \
-    cython==0.29.0 \
-    flatbuffers \
-    psutil \
-    $(if [ "$PY_MINOR" -lt "7" ]; then \
-        echo "dataclasses" ; \
-      fi) \
+ && pipenv --python ${PY_MAJOR}.${PY_MINOR} install -r /tmp/requirements.txt \
  # after the install, deleting .cache, .local and /tmp saves space \
  && rm -rf /tmp/* /root/.cache /root/.local \
  && chown -R 9998:0 /opt/ray \

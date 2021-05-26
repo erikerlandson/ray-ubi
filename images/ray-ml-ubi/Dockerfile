@@ -9,6 +9,7 @@ FROM quay.io/erikerlandson/ray-ubi:py-${PY_MAJOR}.${PY_MINOR}-ray-${RAY_VERSION}
 USER root:0
 
 COPY ./requirements.txt /tmp/
+ENV HOROVOD_WITH_GLOO=1
 
 RUN echo \
  && echo "installing c/c++ toolchain" \
