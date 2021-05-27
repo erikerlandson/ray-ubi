@@ -3,7 +3,7 @@ set -x -e
 
 # usage: build.sh <py-major> <py-minor> <full-ray-sha> <image-registry>
 # example:
-# ./build.sh 3 6 864956f81753884357e32840c13610dadf968341 quay.io/erikerlandson
+# ./build.sh 3 6 ea6bdfb9c1cc94492c117086913b18f821a3557a quay.io/erikerlandson
 
 # eventually will replace ray sha with actual version when 2.x releases
 
@@ -48,3 +48,10 @@ podman build --no-cache -t ${REGISTRY}/ray-ml-ubi:${RAY_UBI_TAG} \
        --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
        --build-arg RAY_VERSION=${RAY_VERSION} \
        ./images/ray-ml-ubi
+
+# ray-pipeline has to be installed from local repo
+cp -rf /home/eje/git/ray-pipeline ./images/ray-pipelines-ubi/
+podman build --no-cache -t ${REGISTRY}/ray-pipelines-ubi:${RAY_UBI_TAG} \
+       --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
+       --build-arg RAY_VERSION=${RAY_VERSION} \
+       ./images/ray-pipelines-ubi
