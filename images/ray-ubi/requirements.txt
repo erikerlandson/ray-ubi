@@ -1,0 +1,4 @@
+ray[default] @ https://ray-wheels.s3-us-west-2.amazonaws.com/master/ea6bdfb9c1cc94492c117086913b18f821a3557a/ray-2.0.0.dev0-cp38-cp38-manylinux2014_x86_64.whl
+cython
+flatbuffers
+dataclasses; python_version < '3.7'

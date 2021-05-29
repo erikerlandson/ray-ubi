@@ -1,4 +1,4 @@
-ray[default] @ https://ray-wheels.s3-us-west-2.amazonaws.com/master/RAY_SHA_FULL/ray-2.0.0.dev0-cp36-cp36m-manylinux2014_x86_64.whl
-cython==0.29.0
-flatbuffers==1.12
+ray[default] @ https://ray-wheels.s3-us-west-2.amazonaws.com/master/RAY_SHA_FULL/ray-2.0.0.dev0-cpPYMAJPYMIN-cpPYMAJPYMINMAYBEM-manylinux2014_x86_64.whl
+cython
+flatbuffers
 dataclasses; python_version < '3.7'

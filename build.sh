@@ -32,8 +32,28 @@ export RAY_VERSION=${RAY_SHA_FULL:0:8}
 # ray cares about keeping major+minor python aligned so it is important to tag it that way
 export RAY_UBI_TAG="py-${PY_MAJOR}.${PY_MINOR}-ray-${RAY_VERSION}"
 
+# I swear to god.
+case $PY_MINOR in
+    6 | 7)
+        export MAYBE_M="m"
+        ;;
+    *)
+        export MAYBE_M=""
+        ;;
+esac
+
+
+
+cp -rf /home/eje/git/ray-pipeline ./images/ray-pipelines-notebook/
+podman build --no-cache -t ${REGISTRY}/ray-pipelines-notebook:${RAY_UBI_TAG} \
+       --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
+       --build-arg RAY_VERSION=${RAY_VERSION} \
+       ./images/ray-pipelines-notebook
+
+exit 0
+
 # base image currently has to install ray from nightly wheel which uses SHA
-cat images/ray-ubi/requirements.txt.template | sed s/RAY_SHA_FULL/${RAY_SHA_FULL}/ > images/ray-ubi/requirements.txt
+cat images/ray-ubi/requirements.txt.template | sed s/RAY_SHA_FULL/${RAY_SHA_FULL}/ | sed s/PYMAJ/${PY_MAJOR}/g | sed s/PYMIN/${PY_MINOR}/g | sed s/MAYBEM/${MAYBE_M}/ > images/ray-ubi/requirements.txt
 podman build --no-cache -t ${REGISTRY}/ray-ubi:${RAY_UBI_TAG} \
        --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
        --build-arg RAY_SHA_FULL=${RAY_SHA_FULL} \
@@ -55,3 +75,5 @@ podman build --no-cache -t ${REGISTRY}/ray-pipelines-ubi:${RAY_UBI_TAG} \
        --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
        --build-arg RAY_VERSION=${RAY_VERSION} \
        ./images/ray-pipelines-ubi
+
+exit 0

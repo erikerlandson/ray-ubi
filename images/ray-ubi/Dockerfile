@@ -51,12 +51,19 @@ RUN echo \
 COPY ./requirements.txt /tmp/
 
 RUN echo \
+ && echo "installing c/c++ toolchain" \
+ && microdnf install gcc gcc-c++ make cmake \
+ && echo \
  && echo "installing the ray python environment" \
  && mkdir -p /opt/ray \
  && cd /opt/ray \
  && pipenv --python ${PY_MAJOR}.${PY_MINOR} install -r /tmp/requirements.txt \
+ && echo \
+ && echo "clean up" \
  # after the install, deleting .cache, .local and /tmp saves space \
  && rm -rf /tmp/* /root/.cache /root/.local \
+ && microdnf remove gcc gcc-c++ make cmake-data cmake \
+ && microdnf clean all \
  && chown -R 9998:0 /opt/ray \
  && touch /opt/.bashrc \
  && chmod -R g+rwX /opt
