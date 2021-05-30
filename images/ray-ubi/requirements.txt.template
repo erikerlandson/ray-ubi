@@ -1,4 +1,4 @@
-ray[default] @ https://ray-wheels.s3-us-west-2.amazonaws.com/master/RAY_SHA_FULL/ray-2.0.0.dev0-cpPYMAJPYMIN-cpPYMAJPYMINMAYBEM-manylinux2014_x86_64.whl
+ray[default] @ https://ray-wheels.s3-us-west-2.amazonaws.com/master/_RAY_SHA_FULL_/ray-2.0.0.dev0-cp_PY_MAJ__PY_MIN_-cp_PY_MAJ__PY_MIN__MAYBE_M_-manylinux2014_x86_64.whl
 cython
 flatbuffers
 dataclasses; python_version < '3.7'

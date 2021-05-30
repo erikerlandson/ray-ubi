@@ -42,18 +42,8 @@ case $PY_MINOR in
         ;;
 esac
 
-
-
-cp -rf /home/eje/git/ray-pipeline ./images/ray-pipelines-notebook/
-podman build --no-cache -t ${REGISTRY}/ray-pipelines-notebook:${RAY_UBI_TAG} \
-       --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
-       --build-arg RAY_VERSION=${RAY_VERSION} \
-       ./images/ray-pipelines-notebook
-
-exit 0
-
 # base image currently has to install ray from nightly wheel which uses SHA
-cat images/ray-ubi/requirements.txt.template | sed s/RAY_SHA_FULL/${RAY_SHA_FULL}/ | sed s/PYMAJ/${PY_MAJOR}/g | sed s/PYMIN/${PY_MINOR}/g | sed s/MAYBEM/${MAYBE_M}/ > images/ray-ubi/requirements.txt
+cat images/ray-ubi/requirements.txt.template | sed s/_RAY_SHA_FULL_/${RAY_SHA_FULL}/ | sed s/_PY_MAJ_/${PY_MAJOR}/g | sed s/_PY_MIN_/${PY_MINOR}/g | sed s/_MAYBE_M_/${MAYBE_M}/ > images/ray-ubi/requirements.txt
 podman build --no-cache -t ${REGISTRY}/ray-ubi:${RAY_UBI_TAG} \
        --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
        --build-arg RAY_SHA_FULL=${RAY_SHA_FULL} \
@@ -76,4 +66,9 @@ podman build --no-cache -t ${REGISTRY}/ray-pipelines-ubi:${RAY_UBI_TAG} \
        --build-arg RAY_VERSION=${RAY_VERSION} \
        ./images/ray-pipelines-ubi
 
-exit 0
+cat images/ray-pipelines-notebook/requirements.txt.template | sed s/_RAY_SHA_FULL_/${RAY_SHA_FULL}/ | sed s/_PY_MAJ_/${PY_MAJOR}/g | sed s/_PY_MIN_/${PY_MINOR}/g | sed s/_MAYBE_M_/${MAYBE_M}/ > images/ray-pipelines-notebook/requirements.txt
+cp -rf /home/eje/git/ray-pipeline ./images/ray-pipelines-notebook/
+podman build --no-cache -t ${REGISTRY}/ray-pipelines-notebook:${RAY_UBI_TAG} \
+       --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
+       --build-arg RAY_VERSION=${RAY_VERSION} \
+       ./images/ray-pipelines-notebook
