@@ -35,7 +35,7 @@ ENV LANG="C.UTF-8" \
 # ray operator/autoscaler
 RUN echo \
  && echo "installing OS package deps" \
- && microdnf install python${PY_MAJOR}${PY_MINOR} which procps-ng \
+ && microdnf install python${PY_MAJOR}${PY_MINOR} which procps-ng gcc gcc-c++ make cmake python${PY_MAJOR}${PY_MINOR}-devel \
  && microdnf clean all \
  && echo \
  && echo "installing pipenv" \

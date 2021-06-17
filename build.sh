@@ -1,11 +1,9 @@
 #!/bin/bash
 set -x -e
 
-# usage: build.sh <py-major> <py-minor> <full-ray-sha> <image-registry>
+# usage: build.sh <py-major> <py-minor> <ray-version> <image-registry>
 # example:
-# ./build.sh 3 6 864956f81753884357e32840c13610dadf968341 quay.io/erikerlandson
-
-# eventually will replace ray sha with actual version when 2.x releases
+# ./build.sh 3 6 1.4.0 quay.io/erikerlandson
 
 # intended to be run from top of the repo, for example:
 # cd /path/to/ray-ubi
@@ -23,20 +21,20 @@ set -x -e
 # command line args
 export PY_MAJOR=$1
 export PY_MINOR=$2
-export RAY_SHA_FULL=$3
+export RAY_VERSION=$3
 export REGISTRY=$4
-
-# eventually this will be actual version, like 2.0.0
-export RAY_VERSION=${RAY_SHA_FULL:0:8}
 
 # ray cares about keeping major+minor python aligned so it is important to tag it that way
 export RAY_UBI_TAG="py-${PY_MAJOR}.${PY_MINOR}-ray-${RAY_VERSION}"
 
-# base image currently has to install ray from nightly wheel which uses SHA
-cat images/ray-ubi/requirements.txt.template | sed s/RAY_SHA_FULL/${RAY_SHA_FULL}/ > images/ray-ubi/requirements.txt
+cat images/ray-ml-notebook/requirements.txt.template | sed s/RAY_VERSION/${RAY_VERSION}/ > images/ray-ml-notebook/requirements.txt
+podman build --no-cache -t ${REGISTRY}/ray-ml-notebook:${RAY_UBI_TAG} \
+       --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
+       ./images/ray-ml-notebook
+
+cat images/ray-ubi/requirements.txt.template | sed s/RAY_VERSION/${RAY_VERSION}/ > images/ray-ubi/requirements.txt
 podman build --no-cache -t ${REGISTRY}/ray-ubi:${RAY_UBI_TAG} \
        --build-arg PY_MAJOR=${PY_MAJOR} --build-arg PY_MINOR=${PY_MINOR} \
-       --build-arg RAY_SHA_FULL=${RAY_SHA_FULL} \
        ./images/ray-ubi
 
 podman build --no-cache -t ${REGISTRY}/ray-operator-ubi:${RAY_UBI_TAG} \
