@@ -1,13 +1,21 @@
-# keep this in sync with:
-# https://github.com/erikerlandson/ray-odh-jupyter/tree/main/images/ray-ml-notebook
+# keep this in sync with ray-ml-notebook
+
+# pickle5 needs to be explicitly installed as a codeflare dep
+codeflare==0.1.0.dev0
+pickle5==0.0.11
+# ibm example dep
+lale==0.5.3
 
 tensorflow==2.4.1
 horovod[ray]==0.21.3
 keras==2.4.3
+
 scikit-learn==0.24.1
+
 dask[array,dataframe]==2021.2.0
 toolz==0.11.1
 pandas==1.1.5
 scipy==1.5.4
+
 xgboost==1.4.2
 xgboost-ray==0.1.0

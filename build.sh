@@ -1,9 +1,11 @@
 #!/bin/bash
 set -x -e
 
+# python 3.8 is the only known version to support all the dependencies
+# these images currently consume
 # usage: build.sh <py-major> <py-minor> <ray-version> <image-registry>
 # example:
-# ./build.sh 3 6 1.4.0 quay.io/erikerlandson
+# ./build.sh 3 8 1.4.0 quay.io/erikerlandson
 
 # intended to be run from top of the repo, for example:
 # cd /path/to/ray-ubi
