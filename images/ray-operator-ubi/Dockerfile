@@ -11,9 +11,6 @@ USER root:0
 # The autoscaler needs the kubectl binary to talk to the kube cluster API
 ENV OC_CLIENT_RELEASE=4.6.0-0.okd-2021-01-23-132511
 RUN echo \
- && echo "install wget and tar" \
- && microdnf install wget tar gzip \
- && echo \
  && echo "download and install the kubectl static binary" \
  && cd /tmp \
  && wget -nv https://github.com/openshift/okd/releases/download/${OC_CLIENT_RELEASE}/openshift-client-linux-${OC_CLIENT_RELEASE}.tar.gz \
@@ -23,8 +20,7 @@ RUN echo \
  && echo \
  && echo "clean up" \
  && rm -rf /tmp/* \
- && microdnf remove wget tar gzip \
- && microdnf clean all
+ && echo
 
 # ray operator requires deps for autoscaler functionality
 COPY ./requirements.txt /tmp/

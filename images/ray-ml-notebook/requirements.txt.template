@@ -1,6 +1,12 @@
-# keep this in sync with ray-ml-notebook
+# ray core deps
+ray[default]==RAY_VERSION
+cython
+flatbuffers
+dataclasses; python_version < '3.7'
 
-# pickle5 needs to be explicitly installed as a codeflare dep
+# below sync with ray-ml-ubi deps
+
+# ibm codeflare
 codeflare==0.1.0.dev0
 pickle5==0.0.11
 # ibm example dep

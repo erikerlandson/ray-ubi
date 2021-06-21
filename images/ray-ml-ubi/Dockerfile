@@ -12,9 +12,6 @@ COPY ./requirements.txt /tmp/
 ENV HOROVOD_WITH_GLOO=1
 
 RUN echo \
- && echo "installing c/c++ toolchain" \
- && microdnf install gcc gcc-c++ make cmake \
- && echo \
  && echo "installing ML python libraries" \
  && cd /opt/ray \
  && pipenv install -r /tmp/requirements.txt \
@@ -23,8 +20,7 @@ RUN echo \
  && echo \
  && echo "clean up" \
  && rm -rf /tmp/* /root/.cache /root/.local \
- && microdnf remove gcc gcc-c++ make cmake-data cmake \
- && microdnf clean all
+ && echo
 
 # emulate anonymous uid
 USER 9999:0
